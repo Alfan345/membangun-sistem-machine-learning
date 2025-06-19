@@ -23,6 +23,8 @@ PREDICTION_COUNT = Counter('prediction_count_total', 'Total count of predictions
 APPROVED_LOAN_GAUGE = Gauge('approved_loan_percentage', 'Percentage of approved loans')
 REJECTED_LOAN_GAUGE = Gauge('rejected_loan_percentage', 'Percentage of rejected loans')
 PREDICTION_PROBABILITY = Histogram('prediction_probability', 'Distribution of prediction probabilities')
+APPROVED_TOTAL = Counter('approved_loan_total', 'Total approved loans')
+REJECTED_TOTAL = Counter('rejected_loan_total', 'Total rejected loans')
 
 # Metrik untuk sistem
 CPU_USAGE = Gauge('system_cpu_usage', 'CPU Usage Percentage')  # Penggunaan CPU
@@ -126,8 +128,10 @@ def predict():
             
             if result['prediction'] == 1:  # Approved
                 APPROVED_LOAN_GAUGE.inc()
+                APPROVED_TOTAL.inc()  # Add this
             else:  # Rejected
                 REJECTED_LOAN_GAUGE.inc()
+                REJECTED_TOTAL.inc()  # Add this
             
             logger.info(f"Prediction: {result['loan_status']} with probability {result['probability']:.4f}")
             return jsonify(result)
