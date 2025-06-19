@@ -1,0 +1,16 @@
+name: loan_approval_classification
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_path: path
+      output_dir: {type: string, default: "models"}
+    command: "python modelling.py --data {data_path} --output {output_dir}"
+  
+  tuning:
+    parameters:
+      data_path: path
+      output_dir: {type: string, default: "models_tuned"}
+    command: "python modelling_tuning.py --data {data_path} --output {output_dir}"

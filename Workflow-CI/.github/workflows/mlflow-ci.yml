@@ -1,0 +1,59 @@
+name: MLflow CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  train-and-register-model:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mlflow==2.19.0 pandas scikit-learn matplotlib seaborn category_encoders joblib
+    
+    - name: Download dataset
+      run: |
+        mkdir -p data
+        wget -O data/loan_data.csv https://raw.githubusercontent.com/yourusername/loan-approval-dataset/main/loan_data.csv
+    
+    - name: Preprocess data
+      run: |
+        python automate_[Nama-siswa].py --input data/loan_data.csv --output data/preprocessed_loan_data.csv
+    
+    - name: Train model with MLflow
+      run: |
+        mlflow run . -e main --experiment-name loan_approval_ci --param-list data_path=data/preprocessed_loan_data.csv output_dir=models
+    
+    - name: Archive model artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: model-artifacts
+        path: models/
+    
+    - name: Build Docker Image
+      run: |
+        mlflow models build-docker -m models/model -n loan-approval-model
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    
+    - name: Push Docker Image
+      run: |
+        docker tag loan-approval-model:latest ${{ secrets.DOCKER_HUB_USERNAME }}/loan-approval-model:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/loan-approval-model:latest
