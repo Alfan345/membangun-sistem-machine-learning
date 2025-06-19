@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/401087627312403039
+creation_time: 1750360500901
+experiment_id: '401087627312403039'
+last_update_time: 1750360500901
+lifecycle_stage: active
+name: loan_approval_classification

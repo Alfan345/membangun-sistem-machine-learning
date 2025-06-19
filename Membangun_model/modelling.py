@@ -10,6 +10,7 @@ import mlflow
 import mlflow.sklearn
 import os
 import logging
+import joblib
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,7 +26,39 @@ def load_data(data_path):
     """Load the preprocessed data"""
     logger.info(f"Loading data from {data_path}")
     try:
+        # Check if path is relative and convert to absolute if needed
+        if not os.path.isabs(data_path):
+            # Try different relative paths if the file doesn't exist
+            if not os.path.exists(data_path):
+                alt_path = os.path.join('..', data_path)
+                if os.path.exists(alt_path):
+                    data_path = alt_path
+                else:
+                    alt_path = os.path.join('..', 'loan_data_preprocessing', 'preprocessed_loan_data.csv')
+                    if os.path.exists(alt_path):
+                        data_path = alt_path
+                    else:
+                        logger.error(f"Could not find the data file at {data_path} or any alternative locations")
+                        raise FileNotFoundError(f"Data file not found: {data_path}")
+        
+        # Check if file exists
+        if not os.path.exists(data_path):
+            logger.error(f"Data file does not exist: {data_path}")
+            raise FileNotFoundError(f"Data file not found: {data_path}")
+        
+        # Check if file is empty
+        if os.path.getsize(data_path) == 0:
+            logger.error(f"Data file is empty: {data_path}")
+            raise ValueError(f"Data file is empty: {data_path}")
+        
+        # Load the data
         df = pd.read_csv(data_path)
+        
+        # Check if dataframe is empty
+        if df.empty:
+            logger.error(f"Loaded dataframe is empty from {data_path}")
+            raise ValueError(f"Loaded dataframe is empty from {data_path}")
+        
         logger.info(f"Data loaded successfully with shape {df.shape}")
         return df
     except Exception as e:
@@ -84,7 +117,6 @@ def train_model(X_train, y_train, params=None):
     """Train a RandomForest model"""
     logger.info("Training RandomForest model")
     try:
-        # Use the best parameters from your grid search
         if params is None:
             params = {
                 'n_estimators': 200,
@@ -134,8 +166,11 @@ def evaluate_model(model, X_val, y_val):
 def main():
     """Main function to run the model training pipeline"""
     try:
-        # Load data
-        df = load_data("loan_data_preprocessing/preprocessed_loan_data.csv")
+        # Load data with correct path resolution
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_path = os.path.join(base_dir, "loan_data_preprocessing", "preprocessed_loan_data.csv")
+        logger.info(f"Looking for data file at: {data_path}")
+        df = load_data(data_path)
         
         # Prepare data
         X_train, X_val, y_train, y_val, scaler = prepare_data(df)
