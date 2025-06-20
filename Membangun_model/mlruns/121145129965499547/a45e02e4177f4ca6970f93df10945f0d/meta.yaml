@@ -1,0 +1,14 @@
+artifact_uri: file:D:/DBS-coding-camp/sistem ML/Membangun_model/mlruns/121145129965499547/a45e02e4177f4ca6970f93df10945f0d/artifacts
+end_time: 1750437117346
+entry_point_name: ''
+experiment_id: '121145129965499547'
+lifecycle_stage: active
+run_id: a45e02e4177f4ca6970f93df10945f0d
+run_name: loan_approval_model
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750437102215
+status: 3
+tags: []
+user_id: ASUS

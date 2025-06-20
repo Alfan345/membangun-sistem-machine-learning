@@ -1,0 +1,10 @@
+artifact_location: file:D:/DBS-coding-camp/sistem ML/Membangun_model/mlruns/121145129965499547/models/m-7e706dcabe9f4650bd67475117f7c0ce/artifacts
+creation_timestamp: 1750437108345
+experiment_id: '121145129965499547'
+last_updated_timestamp: 1750437116563
+model_id: m-7e706dcabe9f4650bd67475117f7c0ce
+model_type: null
+name: model
+source_run_id: a45e02e4177f4ca6970f93df10945f0d
+status: 2
+status_message: null
